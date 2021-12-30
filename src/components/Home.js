@@ -5,6 +5,7 @@ import axios from 'axios';
 const username = localStorage.getItem('username');
 const email = localStorage.getItem('email');
 const userID = localStorage.getItem('userID');
+const token = localStorage.getItem('token');
 
 export default class Home extends React.Component {
     
@@ -27,7 +28,7 @@ export default class Home extends React.Component {
             })
 
         const userURL = `https://hosted-api-website.herokuapp.com/api/users`;
-        axios.get(userURL)
+        axios.get(userURL, { headers: { 'Authorization': `Bearer ${token}`} })
             .then(response => {
                 this.setState({ 
                     users: response.data,

@@ -8,9 +8,10 @@ const initialState = {
     email: "",
     userID: "",
     isLoginValid: false,
-    userNotFound: false
-    
+    userNotFound: false   
 }
+
+const token = localStorage.getItem('token')
 
 export default class Navbar extends React.Component {
 
@@ -21,7 +22,7 @@ export default class Navbar extends React.Component {
 
     componentDidMount() {
         const userURL = `https://hosted-api-website.herokuapp.com/api/users`;
-        axios.get(userURL)
+        axios.get(userURL, { headers: { 'Authorization': `Bearer ${token}`} })
             .then(response => {
                 this.setState({ 
                     users: response.data,

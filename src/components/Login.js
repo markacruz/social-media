@@ -4,6 +4,8 @@ import CreateAnAccount from './CreateAnAccount';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 
+const token = localStorage.getItem('token');
+
 export default class Login extends React.Component {
 
       constructor(props) {
@@ -25,8 +27,9 @@ export default class Login extends React.Component {
       }
 
       componentDidMount() {
-
         localStorage.clear();
+        
+        localStorage.setItem("token", process.env.REACT_APP_AUTH_TOKEN)
         document.body.style.backgroundColor = "#ffffff"
         
         this.setState({
@@ -62,7 +65,7 @@ export default class Login extends React.Component {
         })
 
         const URL = `https://hosted-api-website.herokuapp.com/api/users/${this.state.email}`;
-        axios.get(URL)
+        axios.get(URL, { headers: { 'Authorization': `Bearer ${token}` }})
             .then(response => {
                 try {
                     username = response.data.username;

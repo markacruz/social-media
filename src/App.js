@@ -10,6 +10,7 @@ import DifferentUser from './components/DifferentUser';
 
 const isLoginValid = localStorage.getItem("isLoginValid")
 
+
 export default class App extends React.Component {
 
   state = {
@@ -17,6 +18,11 @@ export default class App extends React.Component {
     email: "",
     userID: "",
     isLoginValid: false,
+    authToken: process.env.REACT_APP_AUTH_TOKEN
+  }
+
+  componentDidMount() {
+    localStorage.setItem("token", process.env.REACT_APP_AUTH_TOKEN)
   }
 
   handleLogin = (_username, _email, _userID, _isLoginValid) => {
@@ -50,25 +56,25 @@ export default class App extends React.Component {
           </Route>
 
           <Route exact path="/login">
-            <Login onLogin={this.handleLogin} />
+            <Login token={this.state.authToken} onLogin={this.handleLogin} />
           </Route>
 
           {isLoginValid &&
           <Route exact path="/home">
               <Navbar handleSignOut={this.handleSignOut}/>
-              <Home id={this.state.userID} username={this.state.username} email={this.state.email} />
+              <Home token={this.state.authToken} id={this.state.userID} username={this.state.username} email={this.state.email} />
           </Route> }
 
           {isLoginValid &&
           <Route exact path="/profile">
               <Navbar handleSignOut={this.handleSignOut}/>
-              <Profile id={this.state.userID} username={this.state.username} email={this.state.email}/>
+              <Profile token={this.state.authToken}  id={this.state.userID} username={this.state.username} email={this.state.email}/>
           </Route> }
 
           {isLoginValid &&
           <Route exact path="/differentUser">
               <Navbar handleSignOut={this.handleSignOut}/>
-              <DifferentUser id={this.state.userID} username={this.state.username} email={this.state.email}/>
+              <DifferentUser token={this.state.authToken} id={this.state.userID} username={this.state.username} email={this.state.email}/>
           </Route> }
 
 

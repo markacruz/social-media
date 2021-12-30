@@ -7,8 +7,7 @@ const username = localStorage.getItem('username')
 const email = localStorage.getItem('email')
 const userID = localStorage.getItem('userID')
 
-const showedUsername = document.getElementById("username");
-const showedEmail = document.getElementById("email");
+const token = localStorage.getItem('token');
 
 export default class Profile extends React.Component {
 
