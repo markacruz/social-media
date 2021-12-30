@@ -1,85 +1,263 @@
 import React from 'react';
 import profilePicture from './profilepicture.jpg';
-import Navbar from './Navbar';
+import axios from 'axios';
+
+const username = localStorage.getItem('username');
+const email = localStorage.getItem('email');
+const userID = localStorage.getItem('userID');
 
 export default class Home extends React.Component {
     
+    state = {
+        posts: [],
+        users: [],
+        createPost: false,
+        text: "",
+        comment: "",
+    }
+
     componentDidMount() {
         document.body.style.backgroundColor = "#f8f8ff";
+        const postURL = `https://hosted-api-website.herokuapp.com/api/posts`;
+        axios.get(postURL)
+            .then(response => {
+                this.setState({ 
+                    posts: response.data.reverse(),
+                })
+            })
+
+        const userURL = `https://hosted-api-website.herokuapp.com/api/users`;
+        axios.get(userURL)
+            .then(response => {
+                this.setState({ 
+                    users: response.data,
+                })
+            })
+        }
+
+    handleChange = (event) => {
+        this.setState({
+            [event.target.name]: event.target.value
+        })
     }
+
+    handleCreatePost = () => {
+        this.setState({
+            createPost: !this.state.createPost
+        })
+    }
+
+    handleSubmit = () => {
+        const post = JSON.stringify({
+            text: this.state.text,
+            postedBy: userID
+        })
+
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts`;
+        axios.post(URL, post, {
+            headers: {
+            'Content-Type': 'application/json',
+            }
+        })
     
+        this.setState({ text: "" })
+    }
+
+    handleDelete = (id) => {
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
+        axios.delete(URL);
+        window.location.reload(false);
+        }
+
+    handleLike = (id) => {
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
+        axios.patch(URL, { likes: userID });
+            window.location.reload(false);
+        }
+
+    handleDislike = (id) => {
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
+        axios.patch(URL, { likes: userID })
+                window.location.reload(false);
+        }
+
+    handleComment = (id, postBy) => {
+
+        const comment = JSON.stringify({
+            text: this.state.comment,
+            commentBy: userID,
+            post: id
+        }) 
+    
+        const commentsURL = `https://hosted-api-website.herokuapp.com/api/posts/${id}/comments`;
+        const postURL = `https://hosted-api-website.herokuapp.com/api/posts/${postBy}`;
+
+        axios.post(commentsURL, comment, {
+            headers: {
+            'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            axios.patch(postURL, { comments: response.data._id })
+        })
+        window.location.reload(false);
+    }
+
     render() {
         return (
             <div>
-                <div>
-                    <Navbar />
-                </div>
-                
-
                 <div className="flex justify-center gap-x-10 mx-[365px] mt-3">
-                    
-                    <div className="flex-none border-[1px] w-[613.75px] py-[14px]">
-                        <div className="pl-[16px] pr-[16px]">   
-                            <div className="flex mb-3">
-                                <div className="flex-none w-[35px]">
-                                    <img className="rounded-full" alt="Profile" src={profilePicture} />
-                                </div>
-                            <div className="pl-3 pt-1 font-semibold">
-                                    {this.props.username}
-                                </div> 
-                            </div>
-
-                            <hr className="mb-2"/>
-
-                            <div className="pl-[16px] pr-[16px]">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque. Nunc posuere purus rhoncus pulvinar aliquam. Ut aliquet tristique nisl vitae volutpat. Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus dictum fermentum vel tincidunt neque. Sed sed lacinia lectus. Duis sit amet sodales felis. Duis nunc eros, mattis at dui ac, convallis semper risus. In adipiscing ultrices tellus, in suscipit massa vehicula euLorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque. Nunc posuere purus rhoncus pulvinar aliquam. Ut aliquet tristique nisl vitae volutpat. Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus dictum fermentum vel tincidunt neque. Sed sed lacinia lectus. Duis sit amet sodales felis. Duis nunc eros, mattis at dui ac, convallis semper risus. In adipiscing ultrices tellus, in suscipit massa vehicula eu
-                            </div>
-
-                            <hr className="mt-3 mb-2"/>
-
-                            <div className="font-semibold my-2">
-                                10 Likes
-                            </div>
-
-                            <div className="flex gap-x-2 my-2">
-                                <div className="flex-none">
-                                    <button className="text-white bg-red-400 rounded-sm px-3">
-                                        Like
-                                    </button>
-                                </div>
-                                <div className="flex-none">
-                                    <button className="text-white bg-blue-400 rounded-sm px-3">
-                                        Comment
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="text-gray-500 text-sm mb-2">
-                                December 19, 2021
-                            </div>
-
-                        </div>
-                    
-                        <hr className="mb-3"/>
+                    <div className="flex-none mt-3">
                         
-                        <div className="flex pl-[16px] pr-[16px]">
-                            <div className="flex-none">
-                                <input className="bg-[#f8f8ff] outline-0 w-[540px]" placeholder="Add a comment..." />
+                        {this.state.posts.map(post => (
+                            <div className="border-[1px] w-[613.75px] py-[14px] pl-[16px] pr-[16px] mb-3"
+                            key={post._id}>   
+                                <div className="flex mb-3">
+                                    <div className="flex-none w-[35px]">
+                                        <img className="rounded-full" alt="Profile" src={profilePicture} />
+                                    </div>
+                                    <div className="flex-none pl-3 pt-1 font-semibold">
+                                        {post.postedBy.username}
+                                    </div> 
+                                </div>
+
+                                <hr className="mb-2"/>
+
+                                <div className="pl-[16px] pr-[16px]">
+                                    {post.text}
+                                </div>
+
+                                <hr className="mt-3 mb-2"/>
+
+                                <div className="font-semibold my-2">
+                                    {post.likes.length} likes
+                                </div>
+
+                                <div className="flex gap-x-2 my-2">
+                                    <div className="flex-none">
+                                        { post.likes.includes(userID) ?
+                                            <button className="text-white bg-red-600 rounded-sm px-3" disabled={true}>
+                                                Like
+                                            </button> : <button className="text-white bg-red-400 rounded-sm px-3"
+                                             onClick={() => this.handleLike(post._id)}>
+                                                 Like
+                                             </button>}
+                                    </div>
+                                    <div className="flex-none">
+                                        {this.state.commentClicked ? 
+                                        <button className="text-white bg-blue-500 rounded-sm px-3"
+                                        onClick={() => this.setState({ commentClicked: !this.state.commentClicked })}>
+                                            Comment
+                                        </button> :
+                                        <button className="text-white bg-blue-400 rounded-sm px-3"
+                                        onClick={() => this.setState({ commentClicked: !this.state.commentClicked })}>
+                                            Comment
+                                        </button> }
+                                    </div>
+                                    {post.postedBy._id === userID ? <div className="flex-none">
+                                        <button className="text-white bg-red-500 rounded-sm px-3"
+                                        onClick={() => this.handleDelete(post._id)}>
+                                            Delete
+                                        </button>
+                                    </div> : null}
+                                </div>
+
+                                <div className="text-gray-500 text-sm mb-2">
+                                    {post.date}
+                                </div>
+                            
+                                {this.state.commentClicked ? 
+                                    <div>
+                                    <hr className="mb-3"/>
+                                    {post.comments.map(comment => (
+                                        <div key={comment._id}>
+                                            <div className="flex">
+                                                <div className="flex-none">
+                                                    <img src={profilePicture} className="rounded-full w-[35px]"/>
+                                                </div>
+
+                                                <div className="flex-none pl-3 pt-1 font-semibold">
+                                                    {this.state.users.map(user => (
+                                                        user._id === comment.commentBy ? 
+                                                            <div key={user._id} className="flex gap-x-2">
+                                                                <div>
+                                                                    {user.username}
+                                                                </div>
+                                                                
+                                                                <div className="text-sm font-normal text-gray-500 mt-[3px]">
+                                                                    {comment.date}   
+                                                                </div>
+                                                                
+                                                            </div> : null
+                                                    ))}
+                                                </div>                                          
+                                            </div>
+
+                                            <div className="ml-[47.5px]">
+                                                {comment.text}
+                                            </div>
+
+                                            <div className="text-sm text-gray-500 ml-[47.5px]">
+                                                
+                                            </div>
+
+                                            <hr className="my-2"/>
+                                    
+                                        </div>
+                                    
+                                    ))}
+
+                                    <div className="flex pl-[16px] pr-[16px]">
+                                        <div className="flex-none">
+                                            <input className="bg-[#f8f8ff] outline-0 w-[540px]" 
+                                            placeholder="Add a comment..." 
+                                            values={this.state.comment}
+                                            onChange={this.handleChange}
+                                            name="comment"/>
+                                        </div>
+
+                                        <div className="flex-none">
+                                            <button className="text-blue-500"
+                                            onClick={() => this.handleComment(post._id, post.postedBy._id)}>
+                                                Post
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                 : null }
                             </div>
 
-                            <div className="flex-none">
-                                <button className="text-blue-500">Post</button>
-                            </div>
-                        </div>
-
+                        ))}
+                        
                     </div>
                     
                     <div className="flex-none w-[295px] my-7">
 
-                        <div className="mb-6">
-                            <button className="bg-blue-500 w-full p-2 text-white rounded-sm">
+                        <div className="mb-4">
+                            <button className="bg-blue-500 w-full p-2 text-white rounded-sm"
+                            onClick={this.handleCreatePost}>
                                 + Create a Post
                             </button>
+
+                            {this.state.createPost ? 
+                                <form className="w-full bg-gray-200"
+                                onSubmit={this.handleSubmit}>
+                                    <div className='text-center'>
+                                        <textarea className="px-2 mt-4 h-32 w-64 outline-0 rounded-sm resize-none"
+                                        placeholder="What's on your mind?" 
+                                        name="text"
+                                        value={this.state.text}
+                                        onChange={this.handleChange}/>
+                                    </div>
+                                    
+                                    <div className='px-5'>
+                                        <button className="bg-blue-500 text-white px-2 rounded-sm mb-2">
+                                            Post
+                                        </button>
+                                    </div>
+                                </form> : null }
+
                         </div>
 
                         <div className="flex">
@@ -88,10 +266,10 @@ export default class Home extends React.Component {
                             </div>
                             <div className="flex-none">
                                 <div className="pt-4 pl-4">
-                                    {this.props.username}
+                                    {username}
                                 </div>
                                 <div className="text-gray-400 text-sm pt-0 pl-4">
-                                    {this.props.email}
+                                    {email}
                                 </div>
                             </div>
                         </div>

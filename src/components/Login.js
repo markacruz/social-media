@@ -24,6 +24,23 @@ export default class Login extends React.Component {
         }
       }
 
+      componentDidMount() {
+
+        localStorage.clear();
+        document.body.style.backgroundColor = "#ffffff"
+        
+        this.setState({
+            username: "",
+            email: "",
+            password: "",
+            forgotPassword: false,
+            createAnAccount: false,
+            isValid: false,
+            userNotFound: false,
+            incorrectPassword: false
+        })
+      }
+
       handleChange = (event) => {
           this.setState({
               [event.target.name]: event.target.value
@@ -31,53 +48,60 @@ export default class Login extends React.Component {
       }
 
       handleSubmit = (event) => {
-          event.preventDefault();
+        event.preventDefault();
 
-      let username;
-      let email;
-      let password;
+        let username;
+        let email;
+        let password;
+        let id;
 
-      this.setState({
-          isValid: false,
-          incorrectPassword: false,
-          userNotFound: false
-      })
+        this.setState({
+            isValid: false,
+            incorrectPassword: false,
+            userNotFound: false
+        })
 
-      const URL = `https://hosted-api-website.herokuapp.com/api/users/${this.state.email}`;
-      axios.get(URL)
-          .then(response => {
-              try {
-                  username = response.data.username;
-                  email = response.data.email;
-                  password = response.data.password;
+        const URL = `https://hosted-api-website.herokuapp.com/api/users/${this.state.email}`;
+        axios.get(URL)
+            .then(response => {
+                try {
+                    username = response.data.username;
+                    email = response.data.email;
+                    password = response.data.password;
+                    id = response.data._id;
 
-                  if (this.state.email === email) {
-                      if (this.state.password === password) {
-                              this.setState({
-                                  isValid: !this.state.isValid
-                              });
+                    if (this.state.email === email) {
+                        if (this.state.password === password) {
+                                this.setState({
+                                    isValid: true
+                                });
 
-                              this.props.onLogin(username, email, this.state.isValid);
+                                localStorage.setItem('username', username);
+                                localStorage.setItem('email', email);
+                                localStorage.setItem('userID', id);
+                                localStorage.setItem('isLoginValid', password);
 
-                          } else {
-                              this.setState({
-                                  incorrectPassword: !this.state.incorrectPassword
-                              });
-                          } 
-                  } else {
-                      this.setState({
-                          userNotFound: !this.state.userNotFound
-                      });
-                  }
-              } catch {
-                  this.setState({
-                      userNotFound: !this.state.userNotFound
-                  });
-              }
-          }).catch (err => {
-              console.log(err)
-          });
-  }
+                                this.props.onLogin(username, email, id, this.state.isValid);
+
+                            } else {
+                                this.setState({
+                                    incorrectPassword: !this.state.incorrectPassword
+                                });
+                            } 
+                    } else {
+                        this.setState({
+                            userNotFound: !this.state.userNotFound
+                        });
+                    }
+                } catch {
+                    this.setState({
+                        userNotFound: !this.state.userNotFound
+                    });
+                }
+            }).catch (err => {
+                console.log(err)
+            });
+    }
 
   handler() {
       this.setState({
@@ -131,7 +155,7 @@ export default class Login extends React.Component {
                       <div>
                           <input
                               name="email"
-                              className="text-xl w-72 h-12 p-3 mb-1 rounded-sm border-[1px]" 
+                              className="text-xl w-72 h-12 p-3 mb-1 rounded-sm border-[1px] outline-0" 
                               placeholder="Email address" 
                               value={this.state.email} 
                               onChange={this.handleChange}>
@@ -148,7 +172,7 @@ export default class Login extends React.Component {
                       <div>
                           <input
                               name="password"
-                              className="text-xl w-72 h-12 p-3 mt-2 mb-1 rounded-sm border-[1px]" 
+                              className="text-xl w-72 h-12 p-3 mt-2 mb-1 rounded-sm border-[1px] outline-0" 
                               placeholder="Password" 
                               value={this.state.password} 
                               type="password"

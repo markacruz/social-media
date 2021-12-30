@@ -36,7 +36,11 @@ export default class CreateAnAccount extends React.Component {
         })
             .then(response => {
                 if (response.status === 200) {
-                    this.props.isValid();
+                    this.props.isValidHandler();
+                    localStorage.setItem("username", this.state.username);
+                    localStorage.setItem("email", this.state.email);
+                    localStorage.setItem("userID", response.data._id);
+                    localStorage.setItem("isLoginValid", true);
                 } else {
                     this.setState({
                         error: response.status + ": " + response.statusText
@@ -59,7 +63,7 @@ export default class CreateAnAccount extends React.Component {
                     <div>
                     <input
                         name="username"
-                        className="text-xl w-72 p-3 h-12 mb-3 rounded-sm border-[1px]" 
+                        className="text-xl w-72 p-3 h-12 mb-3 rounded-sm border-[1px] outline-0" 
                         placeholder="Username" 
                         value={this.state.username} 
                         onChange={this.handleChange}>
@@ -69,7 +73,7 @@ export default class CreateAnAccount extends React.Component {
                     <div>
                         <input
                             name="email"
-                            className="text-xl w-72 p-3 h-12 mb-3 rounded-sm border-[1px]" 
+                            className="text-xl w-72 p-3 h-12 mb-3 rounded-sm border-[1px] outline-0" 
                             placeholder="Email Address" 
                             value={this.state.email} 
                             onChange={this.handleChange}>
@@ -80,7 +84,7 @@ export default class CreateAnAccount extends React.Component {
                         <input
                             name="password"
                             type="password"
-                            className="text-xl w-72 h-12 p-3 mb-3 rounded-sm border-[1px]" 
+                            className="text-xl w-72 h-12 p-3 mb-3 rounded-sm border-[1px] outline-0" 
                             placeholder="Enter your password" 
                             value={this.state.password} 
                             onChange={this.handleChange}>
@@ -91,7 +95,7 @@ export default class CreateAnAccount extends React.Component {
                         <input
                             name="confirmPassword"
                             type="password"
-                            className="text-xl w-72 h-12 p-3 mb-5 rounded-sm border-[1px]" 
+                            className="text-xl w-72 h-12 p-3 mb-5 rounded-sm border-[1px] outline-0" 
                             placeholder="Re-enter your password" 
                             value={this.state.confirmPassword} 
                             onChange={this.handleChange}>
