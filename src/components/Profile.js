@@ -15,19 +15,22 @@ export default class Profile extends React.Component {
         posts: [],
         editProfile: false,
         createPost: false,
+        text: ""
     }
 
-    componentDidMount() {
-
+    componentWillMount() {
+        
+        document.body.style.backgroundColor = "#f8f8ff";
+        
         const URL = `https://hosted-api-website.herokuapp.com/api/posts/${userID}`;
-            axios.get(URL)
-            .then(response => {
+        axios.get(URL)
+        .then(response => {
 
-                this.setState({ 
-                    posts: response.data.reverse()
-                })
-            }).catch((err) => {console.log(err)})
-        }
+            this.setState({ 
+                posts: response.data.reverse()
+            })
+        }).catch((err) => {console.log(err)})
+    }
 
     handleEditProfile = () => {
         this.setState({
@@ -47,20 +50,21 @@ export default class Profile extends React.Component {
         })
     }
 
-    handleSubmit = () => {
-        
-        const post = JSON.stringify({
+    handleSubmit(e){
+        e.preventDefault();
+        let post = JSON.stringify({
             text: this.state.text,
-            likes: 0,
             postedBy: userID
         })
 
-        const URL = `https://hosted-api-website.herokuapp.com/api/posts/`;
-        axios.post(URL, post, { 
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts`;
+        axios.post(URL, post, {
             headers: {
             'Content-Type': 'application/json',
             }
         })
+
+        this.setState({ text: "" })
     }
 
     handleDelete = (id) => {
@@ -75,11 +79,14 @@ export default class Profile extends React.Component {
 
     render() {
         return(
-
-            <div className="h-screen">
-                <div className="mb-auto mx-[500px] my-5">
-                    
+            <div className="flex flex-col h-[95vh]">
+                <div className="flex mb-auto mx-[500px]">
                     <div>
+                        <div>
+
+                         {this.state.editProfile ? <Edit id={userID} /> : null } 
+
+
                         <header className="flex m-5">
                             <div className="flex-none m-4 w-[200px]">
                                 <img className=" border-2 rounded-full" src={profilePicture} alt="Profile" />
@@ -102,11 +109,14 @@ export default class Profile extends React.Component {
                                 </button>
                             </div>
 
+                            
                         </header>
+
+                        </div>
 
                         <hr />
 
-                        {this.state.editProfile ? <Edit id={userID} /> : 
+                        
                     
                         <div className="flex gap-x-10 mt-5">
                             <div className="flex-none w-[650px] h-[450px] px-5 h-fit">
@@ -119,6 +129,15 @@ export default class Profile extends React.Component {
                                 
                                 <hr />
 
+                                {this.state.posts.length === 0 ? 
+
+                                <div className="mx-4 mt-2 text-lg">
+                                    No posts yet...
+                                </div>
+
+                                : null}
+
+                        
                                 {this.state.posts.map(post => (
                                     <div className="mt-2"
                                     key={post._id}>
@@ -145,7 +164,7 @@ export default class Profile extends React.Component {
                                         </div>
 
                                     </div>
-                                ))}
+                                ))} 
 
                             </div>
 
@@ -175,20 +194,17 @@ export default class Profile extends React.Component {
                                 </div>
                             </div>
                         </div>
-
-                        }
-
                     </div>
-
-                
-
                 </div>
 
-                <div className="pb-5 pt-20 w-full text-center text-sm bottom-0 static">
+                <div className="pb-5 pt-20 w-full text-center text-sm">
                         <div className="text-gray-500">
                             © 2021 Mark Angelo Cruz
                         </div>
                 </div>
+                
+
+                
 
             </div>
         )

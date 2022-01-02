@@ -1,6 +1,7 @@
 import React from 'react';
 import profilePicture from './profilepicture.jpg';
 import axios from 'axios';
+import { Link } from 'react-router-dom'
 
 const username = localStorage.getItem('username');
 const email = localStorage.getItem('email');
@@ -19,13 +20,6 @@ export default class Home extends React.Component {
 
     componentDidMount() {
         document.body.style.backgroundColor = "#f8f8ff";
-        const postURL = `https://hosted-api-website.herokuapp.com/api/posts`;
-        axios.get(postURL)
-            .then(response => {
-                this.setState({ 
-                    posts: response.data.reverse(),
-                })
-            })
 
         const userURL = `https://hosted-api-website.herokuapp.com/api/users`;
         axios.get(userURL, { headers: { 'Authorization': `Bearer ${token}`} })
@@ -34,7 +28,16 @@ export default class Home extends React.Component {
                     users: response.data,
                 })
             })
+        
+        const postURL = `https://hosted-api-website.herokuapp.com/api/posts`;
+        axios.get(postURL)
+            .then(response => {
+                this.setState({ 
+                    posts: response.data.reverse(),
+                })
+            })
         }
+        
 
     handleChange = (event) => {
         this.setState({
@@ -48,41 +51,62 @@ export default class Home extends React.Component {
         })
     }
 
-    handleSubmit = () => {
+    handleSubmit = (event) => {
+        event.preventDefault();
         const post = JSON.stringify({
             text: this.state.text,
             postedBy: userID
         })
+
+        const postParsed = {
+            text: this.state.text,
+            postedBy: userID,
+            likes: [],
+            comment: [],
+        }
 
         const URL = `https://hosted-api-website.herokuapp.com/api/posts`;
         axios.post(URL, post, {
             headers: {
             'Content-Type': 'application/json',
             }
-        })
-    
+        }).then(response => {
+            this.setState(prevState => ({
+                posts: [postParsed, ...prevState.posts]
+            }))
+            }
+        )
         this.setState({ text: "" })
     }
 
     handleDelete = (id) => {
         const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
         axios.delete(URL);
-        window.location.reload(false);
         }
 
     handleLike = (id) => {
         const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
         axios.patch(URL, { likes: userID });
-            window.location.reload(false);
         }
 
-    handleDislike = (id) => {
+    handleDislike = (id, userId) => {
+        
+        let newLikes = [];
+
         const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
-        axios.patch(URL, { likes: userID })
-                window.location.reload(false);
-        }
+        axios.get(URL)
+            .then(response => {
+                newLikes = response.data.likes;
 
-    handleComment = (id, postBy) => {
+                let index = newLikes.indexOf(userId);
+                newLikes.splice(index, 1);
+
+                axios.patch(URL, { likes: userId })
+                        window.location.reload(false);
+                })
+            }
+
+    handleComment = (id) => {
 
         const comment = JSON.stringify({
             text: this.state.comment,
@@ -91,7 +115,7 @@ export default class Home extends React.Component {
         }) 
     
         const commentsURL = `https://hosted-api-website.herokuapp.com/api/posts/${id}/comments`;
-        const postURL = `https://hosted-api-website.herokuapp.com/api/posts/${postBy}`;
+        const postURL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
 
         axios.post(commentsURL, comment, {
             headers: {
@@ -101,15 +125,15 @@ export default class Home extends React.Component {
         .then(response => {
             axios.patch(postURL, { comments: response.data._id })
         })
-        window.location.reload(false);
     }
 
     render() {
         return (
             <div>
                 <div className="flex justify-center gap-x-10 mx-[365px] mt-3">
-                    <div className="flex-none mt-3">
-                        
+                    
+                    {(this.state.posts.length !== 0) ? 
+                    <div className="flex-none mt-7">
                         {this.state.posts.map(post => (
                             <div className="border-[1px] w-[613.75px] py-[14px] pl-[16px] pr-[16px] mb-3"
                             key={post._id}>   
@@ -117,9 +141,11 @@ export default class Home extends React.Component {
                                     <div className="flex-none w-[35px]">
                                         <img className="rounded-full" alt="Profile" src={profilePicture} />
                                     </div>
+                                    
                                     <div className="flex-none pl-3 pt-1 font-semibold">
                                         {post.postedBy.username}
                                     </div> 
+                    
                                 </div>
 
                                 <hr className="mb-2"/>
@@ -131,13 +157,13 @@ export default class Home extends React.Component {
                                 <hr className="mt-3 mb-2"/>
 
                                 <div className="font-semibold my-2">
-                                    {post.likes.length} likes
+                                    {post.likes.length} likes, {post.comments.length} comments
                                 </div>
 
                                 <div className="flex gap-x-2 my-2">
                                     <div className="flex-none">
                                         { post.likes.includes(userID) ?
-                                            <button className="text-white bg-red-600 rounded-sm px-3" disabled={true}>
+                                            <button className="text-white bg-red-600 rounded-sm px-3">
                                                 Like
                                             </button> : <button className="text-white bg-red-400 rounded-sm px-3"
                                              onClick={() => this.handleLike(post._id)}>
@@ -198,11 +224,7 @@ export default class Home extends React.Component {
                                                 {comment.text}
                                             </div>
 
-                                            <div className="text-sm text-gray-500 ml-[47.5px]">
-                                                
-                                            </div>
-
-                                            <hr className="my-2"/>
+                                            <hr className="my-3"/>
                                     
                                         </div>
                                     
@@ -219,7 +241,7 @@ export default class Home extends React.Component {
 
                                         <div className="flex-none">
                                             <button className="text-blue-500"
-                                            onClick={() => this.handleComment(post._id, post.postedBy._id)}>
+                                            onClick={() => this.handleComment(post._id)}>
                                                 Post
                                             </button>
                                         </div>
@@ -227,11 +249,18 @@ export default class Home extends React.Component {
 
                                 </div>
                                  : null }
-                            </div>
-
-                        ))}
+                            </div> 
+                        ))} 
                         
+                    </div>  : 
+                    
+                    <div className="flex-none mt-7">
+                        <div className="border-[1px] w-[613.75px] py-[14px] pl-[16px] pr-[16px] mb-3 italic">
+                        “It is beautiful, it is endless, it is full and yet seems empty. It hurts us.”
+                        ― Jackson Pearce, Fathomless
+                        </div>
                     </div>
+                    }
                     
                     <div className="flex-none w-[295px] my-7">
 
@@ -263,14 +292,22 @@ export default class Home extends React.Component {
 
                         <div className="flex">
                             <div className="flex-none w-[75px]">
-                                <img className="border-[1px] rounded-full" alt="Profile" src={profilePicture} />
+                                <button>
+                                    <Link to='/profile'>
+                                        <img className="border-[1px] rounded-full" alt="Profile" src={profilePicture} />
+                                    </Link>
+                                </button>
                             </div>
                             <div className="flex-none">
                                 <div className="pt-4 pl-4">
-                                    {username}
+                                    <Link to='/profile'>
+                                        {username}
+                                    </Link>
                                 </div>
                                 <div className="text-gray-400 text-sm pt-0 pl-4">
-                                    {email}
+                                    <Link to='/profile'>
+                                        {email}
+                                    </Link>
                                 </div>
                             </div>
                         </div>

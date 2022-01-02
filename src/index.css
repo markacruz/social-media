@@ -3,11 +3,3 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color:#f8f8ff;
-  font-family: 'Source Sans Pro', sans-serif;
-}
-
-hr {
-  color:#A9A9A9;
-}

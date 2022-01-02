@@ -8,29 +8,33 @@ const token = localStorage.getItem('token');
 
 export default class Login extends React.Component {
 
-      constructor(props) {
-        super(props)
+    constructor(props) {
+    super(props)
 
-        this.handler = this.handler.bind(this);
-        this.userNotFoundHandler = this.userNotFoundHandler.bind(this);
-        this.isValidHandler = this.isValidHandler.bind(this);
-        this.state = {
-            username: "",
-            email: "",
-            password: "",
-            forgotPassword: false,
-            createAnAccount: false,
-            isValid: false,
-            userNotFound: false,
-            incorrectPassword: false
+    this.handler = this.handler.bind(this);
+    this.userNotFoundHandler = this.userNotFoundHandler.bind(this);
+    this.isValidHandler = this.isValidHandler.bind(this);
+    this.state = {
+        username: "",
+        email: "",
+        password: "",
+        forgotPassword: false,
+        createAnAccount: false,
+        isValid: false,
+        userNotFound: false,
+        incorrectPassword: false
         }
-      }
+    }
+
+    componentWillMount() {    
+       document.body.style.backgroundColor = "#f8f8ff";
+    }
 
       componentDidMount() {
         localStorage.clear();
         
         localStorage.setItem("token", process.env.REACT_APP_AUTH_TOKEN)
-        document.body.style.backgroundColor = "#ffffff"
+        document.body.style.backgroundColor = "#f8f8ff"
         
         this.setState({
             username: "",
@@ -86,6 +90,8 @@ export default class Login extends React.Component {
 
                                 this.props.onLogin(username, email, id, this.state.isValid);
 
+                                
+
                             } else {
                                 this.setState({
                                     incorrectPassword: !this.state.incorrectPassword
@@ -126,7 +132,6 @@ export default class Login extends React.Component {
   }
 
     render() {
-
       if (this.state.isValid) {
         return (
             <Redirect to='/profile'/>
@@ -135,14 +140,14 @@ export default class Login extends React.Component {
 
       if (this.state.createAnAccount || this.state.forgotPassword) {
           return (
-            <div className="flex justify-center items-center h-screen">
-              <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 mx-24 shadow-lg border-[1px]">
+            <div className="flex gap-x-16 justify-center items-center h-screen">
+              <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px]">
                 <div className="text-center">
                   <CreateAnAccount action={this.handler} userNotFound={this.userNotFoundHandler} isValidHandler={this.isValidHandler}/> 
                 </div>
               </div>
 
-              <div className="flex-none w-[600px] rounded animate-pulse">
+              <div className="flex-none w-[600px] rounded">
                 <img alt="Network" src={networkImage}/>
               </div>
 
@@ -151,8 +156,8 @@ export default class Login extends React.Component {
       }
 
         return (
-          <div className="flex justify-center items-center h-screen">
-            <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 mx-24 shadow-lg border-[1px]">
+          <div className="lg:flex gap-x-16 justify-center items-center h-screen">
+            <div className="lg:flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px] mt-5">
               <div className="text-center">
                   <form onSubmit={this.handleSubmit}>
                       <div>
@@ -219,7 +224,7 @@ export default class Login extends React.Component {
               </div>
             </div>
     
-            <div className="flex-none w-[600px] rounded animate-pulse">
+            <div className="lg:flex-none w-[600px] rounded">
               <img alt="Network" src={networkImage}/>
             </div>
           </div> 

@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 
+const token = localStorage.getItem('token');
+
 export default class CreateAnAccount extends React.Component {
 
     state = {
@@ -32,6 +34,7 @@ export default class CreateAnAccount extends React.Component {
         axios.post(URL, user, { 
             headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
             }
         })
             .then(response => {

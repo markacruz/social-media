@@ -21,10 +21,6 @@ export default class App extends React.Component {
     authToken: process.env.REACT_APP_AUTH_TOKEN
   }
 
-  componentDidMount() {
-    localStorage.setItem("token", process.env.REACT_APP_AUTH_TOKEN)
-  }
-
   handleLogin = (_username, _email, _userID, _isLoginValid) => {
     this.setState({
       username: _username,

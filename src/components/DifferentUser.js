@@ -37,7 +37,6 @@ export default class DifferentUser extends React.Component {
         
         const post = JSON.stringify({
             text: this.state.text,
-            likes: 0,
             postedBy: userID
         })
 

@@ -36,9 +36,9 @@ export default class Edit extends React.Component {
 
     render() {
         return (
-            <div className="my-5 px-48">
-                <div className="justify-center items-center border-[1px] rounded-sm py-4 px-10">
-                    
+            
+            <div className="px-48">
+                <div className="justify-center items-center border-[1px] rounded-sm py-4 px-10 bg-[#f8f8ff] fixed">
                     <div className="text-2xl">
                         Edit Profile
                     </div>
