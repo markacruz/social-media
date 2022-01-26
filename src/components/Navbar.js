@@ -1,39 +1,45 @@
 import React from 'react';
 import { Link, Redirect } from "react-router-dom";
 import axios from 'axios';
-import profile from '../profile.jpg';
+import profile from './profilepicture.jpg';
 import home from '../home.png';
-import signout from '../signout.png'
-
-
-const initialState = {
-    username: "",
-    email: "",
-    userID: "",
-    isLoginValid: false,
-    userNotFound: false
-}
-
-const token = localStorage.getItem('token')
+import message from '../message.png';
+import signout from '../signout.png';
+import ReactDOM from 'react-dom';
 
 export default class Navbar extends React.Component {
 
     state = {
-        searchText: "",
-        users: []
+        searchUser: "",
+        searchResult: [],
+        showSearch: false,
+        noUserFound: false
     }
 
     componentDidMount() {
-        
-        const userURL = `https://hosted-api-website.herokuapp.com/api/users`;
-        axios.get(userURL, { headers: { 'Authorization': `Bearer ${token}`} })
-            .then(response => {
-                this.setState({ 
-                    users: response.data,
-                })
-            })
-        }
+        document.addEventListener('click', this.handleClickOutside, true);
+    }
 
+    componentWillUnmount() {
+        document.removeEventListener('click', this.handleClickOutside, true);
+    }
+
+    handleSearchClick = () => {
+        this.setState({
+            showSearch: true
+        })
+    }
+
+    handleClickOutside = event => {
+        const domNode = ReactDOM.findDOMNode(this);
+    
+        if (!domNode || !domNode.contains(event.target)) {
+            this.setState({
+                searchUser: "",
+                showSearch: false
+            });
+        }
+    }
 
     handleChange = (event) => {
         this.setState({
@@ -43,71 +49,112 @@ export default class Navbar extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        this.state.users.forEach(user => {
-            if (this.state.searchText === user.username) {
-
-                localStorage.setItem('searchedUsername', user.username);
-                localStorage.setItem('searchedEmail', user.email);
-                localStorage.setItem('searchedUserID', user._id);
-
-                <Redirect to="/differentUser" id={user._id}/>
-            } else {
-                this.setState({ userNotFound: true })
-            }
-        });
+        
+        const findUserURL = `http://localhost:3000/api/users?username=${this.state.searchUser}`
+        axios.get(findUserURL)
+        .then(response => {
+            this.setState({ 
+                searchResult: response.data
+            })
+        })
     }
 
     render() {
+
         return ( 
-            <div className="border-[1px] sticky">
-                    <div className="flex mx-[500px] gap-x-3 items-center">
-                        <div className="flex-none w-fit content-end">
+            <div className="border-[1px]">
+                    <div className="flex mx-1/2 justify-center items-center">
+                        
+                        <div className='font-bold text-xl bg-gradient-to-r from-blue-400 to-red-300 text-white px-3 py-1 rounded-lg '>
+                            <Link to="/home">
+                                Facestagram
+                            </Link>
+                        </div>
+
+                        <div className='w-1/12' />
+                        
+                        <div className="w-fit content-end">
                             <form onSubmit={this.handleSubmit}>
-
-                                {this.state.userNotFound ? 
                                 <input 
-                                className="bg-gray-200 outline-0 px-2 border-gray-300 border-[1px] "
-                                placeholder="User not found..."
+                                className="bg-gray-200 outline-0 w-[240px] px-6 py-2 border-gray-300 border-[1px] rounded-xl font-thin"
+                                placeholder="Search"
                                 value={this.state.searchText}
-                                name="searchText"
+                                name="searchUser"
                                 onChange={this.handleChange}
-                                /> :
-                                <input 
-                                className="bg-gray-200 outline-0 px-2 border-gray-300 border-[1px] "
-                                placeholder="Search..."
-                                value={this.state.searchText}
-                                name="searchText"
-                                onChange={this.handleChange}
-                                    /> }
+                                onClick={this.handleSearchClick}
+                                    />
                              </form>
-                        </div>
-                        <div className="flex-none">
+
+                             {this.state.showSearch ? 
+                                <div className='absolute bg-white w-[240px] border-[1px] mt-2 p-3'>
+                                        {this.state.searchResult.length !== 0 ? 
+                                        <div className='flex items-center gap-x-2'>
+                                            <div>
+                                                <img src={profile} 
+                                                className='w-[40px] rounded-full'/>
+                                            </div>
+                                            <div className='flex-col leading-none'>
+                                                
+                                                <Link to={`/profile/${this.state.searchResult.username}`} >
+                                                    <h1 className='font-semibold'
+                                                    >
+                                                        {this.state.searchResult.username}
+                                                    </h1>
+                                                </Link>
+                                                                                         
+                                                <Link to={`/profile/${this.state.searchResult.username}`} >
+                                                    <h1 className='text-sm text-gray-300'
+                                                    >
+                                                        {this.state.searchResult.email}
+                                                    </h1>  
+                                                </Link>
+                        
+                                            </div>
+                                        </div> : 
+                                        <div className='font-semibold'>
+                                            No user found
+                                        </div> }
+                                </div> : null }
+                        </div>     
+
+                        <div className='w-1/12' />
+
+                        <div className="">
                             <button className="text-lg"> 
-                                <Link to="home">
-                                    <img className="w-[35px]" src={home} />
+                                <Link to="/home">
+                                    <img className="w-[50px] mr-2" src={home} />
                                 </Link>
                             </button>
                         </div>
 
-                        <div className="flex-none">
+                        <div className="">
                             <button className="text-lg">
-                                <Link to="profile">
-                                <img className="w-[45px]" src={profile} />
+                                <Link to={`/profile/${this.props.userData.username}`}>
+                                <img className="w-[35px] mr-2 rounded-full" src={profile} />
                                 </Link>
                             </button>
                         </div>
 
-                        <div className="flex-none">
+                        <div className="">
+                            <button className="text-lg">
+                                <Link to={`/profile/${this.props.userData.username}`}>
+                                <img className="w-[60px] mr-2 rounded-full" src={message} />
+                                </Link>
+                            </button>
+                        </div>
+
+                        <div className="">
                             <button className="text-lg"
-                            onClick={() => 
-                            this.props.handleSignOut(initialState.username, initialState.email, initialState.userID, initialState.isLoginValid)}>
-                                <Link to="login">
-                                    <img className="w-[30px]" src={signout} />
+                            onClick={this.props.handleSignOut}>
+                                <Link to="/">
+                                    <img className="w-[27.5px] " src={signout} />
                                 </Link>
                             </button>
                         </div>
 
                         
+
+                                         
                     </div>
             </div>
         )

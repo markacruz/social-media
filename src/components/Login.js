@@ -4,8 +4,6 @@ import CreateAnAccount from './CreateAnAccount';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 
-const token = localStorage.getItem('token');
-
 export default class Login extends React.Component {
 
     constructor(props) {
@@ -26,13 +24,8 @@ export default class Login extends React.Component {
         }
     }
 
-    componentWillMount() {    
-       document.body.style.backgroundColor = "#f8f8ff";
-    }
 
-      componentDidMount() {
-        localStorage.clear();
-        
+    componentDidMount() {        
         localStorage.setItem("token", process.env.REACT_APP_AUTH_TOKEN)
         document.body.style.backgroundColor = "#f8f8ff"
         
@@ -57,10 +50,6 @@ export default class Login extends React.Component {
       handleSubmit = (event) => {
         event.preventDefault();
 
-        let username;
-        let email;
-        let password;
-        let id;
 
         this.setState({
             isValid: false,
@@ -68,45 +57,16 @@ export default class Login extends React.Component {
             userNotFound: false
         })
 
-        const URL = `https://hosted-api-website.herokuapp.com/api/users/${this.state.email}`;
-        axios.get(URL, { headers: { 'Authorization': `Bearer ${token}` }})
+        const loginForm = {
+            email: this.state.email,
+            password: this.state.password
+        }
+
+        const URL = `http://localhost:3000/api/auth/login`;
+        axios.post(URL, loginForm)
             .then(response => {
-                try {
-                    username = response.data.username;
-                    email = response.data.email;
-                    password = response.data.password;
-                    id = response.data._id;
-
-                    if (this.state.email === email) {
-                        if (this.state.password === password) {
-                                this.setState({
-                                    isValid: true
-                                });
-
-                                localStorage.setItem('username', username);
-                                localStorage.setItem('email', email);
-                                localStorage.setItem('userID', id);
-                                localStorage.setItem('isLoginValid', password);
-
-                                this.props.onLogin(username, email, id, this.state.isValid);
-
-                                
-
-                            } else {
-                                this.setState({
-                                    incorrectPassword: !this.state.incorrectPassword
-                                });
-                            } 
-                    } else {
-                        this.setState({
-                            userNotFound: !this.state.userNotFound
-                        });
-                    }
-                } catch {
-                    this.setState({
-                        userNotFound: !this.state.userNotFound
-                    });
-                }
+                this.props.onLogin(response.data, true);
+                this.setState({ username: response.data.username })
             }).catch (err => {
                 console.log(err)
             });
@@ -132,22 +92,23 @@ export default class Login extends React.Component {
   }
 
     render() {
-      if (this.state.isValid) {
+      if (this.props.isLoginValid && this.state.username) {
+        console.log('Im in!')
         return (
-            <Redirect to='/profile'/>
+            <Redirect exact to={`/home`}/>
         )
       }
 
       if (this.state.createAnAccount || this.state.forgotPassword) {
           return (
-            <div className="flex gap-x-16 justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen">
               <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px]">
                 <div className="text-center">
-                  <CreateAnAccount action={this.handler} userNotFound={this.userNotFoundHandler} isValidHandler={this.isValidHandler}/> 
+                  <CreateAnAccount isLoginValid={this.props.isLoginValid} action={this.handler} userNotFound={this.userNotFoundHandler} isValidHandler={this.isValidHandler}/> 
                 </div>
               </div>
 
-              <div className="flex-none w-[600px] rounded">
+              <div className="flex-none w-1/2">
                 <img alt="Network" src={networkImage}/>
               </div>
 
@@ -156,8 +117,8 @@ export default class Login extends React.Component {
       }
 
         return (
-          <div className="lg:flex gap-x-16 justify-center items-center h-screen">
-            <div className="lg:flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px] mt-5">
+          <div className="flex justify-center items-center h-screen gap-x-5">
+            <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px]">
               <div className="text-center">
                   <form onSubmit={this.handleSubmit}>
                       <div>
@@ -224,7 +185,7 @@ export default class Login extends React.Component {
               </div>
             </div>
     
-            <div className="lg:flex-none w-[600px] rounded">
+            <div className="flex-none w-1/2">
               <img alt="Network" src={networkImage}/>
             </div>
           </div> 

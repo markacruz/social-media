@@ -1,45 +1,32 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
-import Welcome from './components/Welcome';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
-import DifferentUser from './components/DifferentUser';
-
-const isLoginValid = localStorage.getItem("isLoginValid")
-
+import Edit from './components/Edit'
 
 export default class App extends React.Component {
 
   state = {
-    username: "",
-    email: "",
-    userID: "",
-    isLoginValid: false,
-    authToken: process.env.REACT_APP_AUTH_TOKEN
+    authToken: process.env.REACT_APP_AUTH_TOKEN,
+    userData: [],
+    isLoginValid: false
   }
 
-  handleLogin = (_username, _email, _userID, _isLoginValid) => {
+  handleLogin = (_userData, _isLoginValid) => {
     this.setState({
-      username: _username,
-      email: _email,
-      userID: _userID,
+      userData: _userData,
       isLoginValid: _isLoginValid
     });
   }
 
-  handleSignOut = (_username, _email, _userID, _isLoginValid) => {
+  handleSignOut = () => {
     this.setState({
-      username: _username,
-      email: _email,
-      userID: _userID,
-      isLoginValid: _isLoginValid
+      isLoginValid: false,
+      userData: []
     });
-
-    localStorage.clear();
-
   }
 
   render() {
@@ -47,32 +34,28 @@ export default class App extends React.Component {
 
       <Router>
         <Switch>
+
           <Route exact path="/">
-            <Welcome />
+            <Login isLoginValid={this.state.isLoginValid} onLogin={this.handleLogin} />
           </Route>
 
-          <Route exact path="/login">
-            <Login token={this.state.authToken} onLogin={this.handleLogin} />
-          </Route>
-
-          {isLoginValid &&
+          {this.state.isLoginValid &&
           <Route exact path="/home">
-              <Navbar handleSignOut={this.handleSignOut}/>
-              <Home token={this.state.authToken} id={this.state.userID} username={this.state.username} email={this.state.email} />
+              <Navbar userData={this.state.userData} handleSignOut={this.handleSignOut}/>
+              <Home userData={this.state.userData} />
           </Route> }
 
-          {isLoginValid &&
-          <Route exact path="/profile">
-              <Navbar handleSignOut={this.handleSignOut}/>
-              <Profile token={this.state.authToken}  id={this.state.userID} username={this.state.username} email={this.state.email}/>
+          {this.state.isLoginValid &&
+          <Route exact path="/profile/:username">
+              <Navbar userData={this.state.userData} handleSignOut={this.handleSignOut}/>
+              <Profile userData={this.state.userData}/>
           </Route> }
 
-          {isLoginValid &&
-          <Route exact path="/differentUser">
-              <Navbar handleSignOut={this.handleSignOut}/>
-              <DifferentUser token={this.state.authToken} id={this.state.userID} username={this.state.username} email={this.state.email}/>
+          {this.state.isLoginValid &&
+          <Route exact path="/edit/:username">
+              <Navbar userData={this.state.userData} handleSignOut={this.handleSignOut}/>
+              <Edit userData={this.state.userData}/>
           </Route> }
-
 
         </Switch>
       </Router>

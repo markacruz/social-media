@@ -1,17 +1,33 @@
 import axios from 'axios';
 import React from 'react';
+import profile from './profilepicture.jpg'
+import { Redirect } from "react-router-dom";
 
 export default class Edit extends React.Component {
 
     state = {
-        newUsername: "",
-        newEmail: "",
+        newUsername: undefined,
+        newEmail: undefined,
+        newDesc: undefined,
         changePassword: false,
-        newPassword: ""
+        newPassword: undefined,
+        confirmPassword: undefined,
+        isFinish: false,
+        passwordError: false
+    }
+
+    componentDidMount() {
+        this.setState({
+            isFinish: false
+        })
     }
 
     handleChangePassword = () => {
-        this.setState({ changePassword: !this.state.changePassword })
+        this.setState({ changePassword: true })
+    }
+
+    handleEditProfile = () => {
+        this.setState({ changePassword: false })
     }
 
     handleChange = (event) => {
@@ -20,102 +36,194 @@ export default class Edit extends React.Component {
         })
     }
 
-    handleSubmit = () => {
-        const URL = `https://hosted-api-website.herokuapp.com/api/users/${this.props.id}`;
-        axios.patch(URL, {
+    handleSubmit = (event) => {
+        event.preventDefault()
+
+        let passwordValid = false;
+
+        if (this.state.newPassword === this.state.confirmPassword) {
+            passwordValid = true
+        } else {
+            this.setState({
+                passwordError: true
+            })
+        }
+
+        const updateUser = {
+            userId: this.props.userData._id,
             username: this.state.newUsername,
             email: this.state.newEmail,
-            password: this.state.newPassword,
-        })
-            .then( response => { 
-                window.location.reload(false);
-            }).catch (err => {
-                console.log(err)
-            });   
+            desc: this.state.newDesc,
+            password: this.state.newPassword
+        }
+
+        if (passwordValid || this.state.newPassword === undefined) {
+            const URL = `http://localhost:3000/api/users/${this.props.userData._id}`;
+            axios.put(URL, updateUser)
+                .then(response => { 
+                    console.log(response)
+                    this.setState({
+                        isFinish: true
+                    })
+                }).catch (err => {
+                    console.log(err)
+                });
+            window.history.pushState({}, null, `/profile/${this.props.userData.username}`)
+        }
     }
 
     render() {
+
+        if (this.state.isFinish) {
+            return (<Redirect exact to={`/profile/${this.props.userData.username}`} />)
+        }
+
         return (
-            
-            <div className="px-48">
-                <div className="justify-center items-center border-[1px] rounded-sm py-4 px-10 bg-[#f8f8ff] fixed">
-                    <div className="text-2xl">
-                        Edit Profile
+            <div className="flex justify-center mt-8">
+                <div className="flex border-[1px] rounded-sm bg-[#f8f8ff] h-[375px]">
+                    
+                    <div className='flex flex-col border-r-[1px] text-lg w-[200px]'>
+                        
+                        <button className='pt-3 pb-3 pl-3 text-left hover:bg-gray-300 focus:border-l-[2px] border-black '
+                        onClick={this.handleEditProfile}>
+                            Edit Profile
+                        </button>
+
+                        <button onClick={this.handleChangePassword}
+                        className='text-left pt-3 pb-3 pl-3 text-left hover:bg-gray-300 focus:border-l-[2px] border-black '>
+                            Change Password
+                        </button>
+
                     </div>
+                    
+                    <div className='flex flex-col justify-center my-10 w-[400px] gap-y-3'>
 
-                    <form onSubmit={this.handleSubmit}>
-                        <div className="flex ml-14 text-lg gap-x-10 mt-2 mb-2">
-                            <div className="flex-none mt-3">
-                                Change Username
-                            </div>
-                            <div className="flex-none rounded-sm">
-                                <input className="pl-3 py-2 w-42 bg-inherit outline-0 border-b-[1px] border-gray-400 text-sm" 
-                                placeholder="Enter new username"
-                                value={this.state.newUsername}
-                                name="newUsername"
-                                onChange={this.handleChange}
-                                />
-                            </div>
-                        </div>
+                        <div className='flex justify-center items-center gap-x-2'>
+                            <img src={profile}
+                            className='w-[70px] rounded-full'
+                            alt="Profile"/>
 
-                        <hr />
-
-                        <div className="flex ml-14 text-lg gap-x-10 mt-2 mb-2">
-                            <div className="flex-none mt-3">
-                                Change Email
-                            </div>
-                            <div className="flex-none rounded-sm">
-                                <input className="pl-3 py-2 w-42 bg-inherit outline-0 border-b-[1px] border-gray-400 text-sm" 
-                                placeholder="Enter new email address"
-                                value={this.state.newEmail}
-                                name="newEmail"
-                                onChange={this.handleChange}
-                                />
+                            <div className='font-semibold'>
+                                <div>
+                                    {this.props.userData.username}
+                                </div>
+                                <div>
+                                    <button className='text-sm text-blue-400 font-semibold'>
+                                        Change Profile Picture
+                                    </button>
+                                </div>
+                                
                             </div>
                         </div>
 
-                        <hr />
+                        {!this.state.changePassword ? 
+                        <form onSubmit={this.handleSubmit}
+                        className='flex flex-col gap-y-4'>
+                            <div className="flex justify-center gap-x-10 items-center">
+                                <div className="font-semibold">
+                                    Username
+                                </div>
+                                <div className="rounded-sm">
+                                    <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                    placeholder={this.props.userData.username}
+                                    value={this.state.newUsername}
+                                    name="newUsername"
+                                    onChange={this.handleChange}
+                                    />
+                                </div>
+                            </div>
 
-                        <div className="text-md text-center mt-5">
-                            <button className="text-black bg-gray-200 border-gray-300 border-[1px] px-3 py-1 rounded-sm"
-                            onClick={this.handleChangePassword}>
-                                Change Password
-                            </button>
-                        </div>
 
-                        {this.state.changePassword ? 
+                            <div className="flex justify-center gap-x-10 items-center">
+                                <div className="font-semibold">
+                                    Email
+                                </div>
+                                <div className="rounded-sm">
+                                    <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                    placeholder={this.props.userData.email}
+                                    value={this.state.newEmail}
+                                    name="newEmail"
+                                    onChange={this.handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center gap-x-10 items-center">
+                                <div className="font-semibold">
+                                    Bio
+                                </div>
+                                <div className="rounded-sm">
+                                    <textarea className="w-[200px] pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                    placeholder={this.props.userData.desc ? this.props.userData.desc : "Enter a bio"}
+                                    value={this.state.newDesc}
+                                    name="newDesc"
+                                    onChange={this.handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="text-md text-center mt-2">
+                                <button className="text-white bg-blue-500 px-3 py-1 rounded-md"
+                                type="submit"
+                                >
+                                    Submit
+                                </button>
+                            </div>
+
+
+                        </form> : 
+
                         <div>
-                            <div className="flex ml-14 text-lg gap-x-10 mt-2 mb-2">
-                                <div className="flex-none mt-3">
-                                    Enter Password
+                            <form onSubmit={this.handleSubmit}
+                        className='flex flex-col gap-y-4'>
+                                <div className="flex justify-center gap-x-10 items-center">
+                                    <div className="font-semibold">
+                                        New Password
+                                    </div>
+                                    <div className="rounded-sm">
+                                        <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                        type="password"
+                                        placeholder= "·········"
+                                        value={this.state.newPassword}
+                                        name="newPassword"
+                                        onChange={this.handleChange}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex-none rounded-sm">
-                                    <input className="pl-3 py-2 w-42 bg-inherit outline-0 border-b-[1px] border-gray-400 text-sm" placeholder="Enter new password"/>
+
+
+                                <div className="flex justify-center gap-x-10 items-center">
+                                    <div className="font-semibold">
+                                        Confirm Password
+                                    </div>
+                                    <div className="rounded-sm">
+                                        <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                        type="password"
+                                        placeholder= "·········"
+                                        value={this.state.confirmPassword}
+                                        name="confirmPassword"
+                                        onChange={this.handleChange}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
 
-                            <hr />
+                                {this.state.passwordError ? 
+                                <div className='text-center text-sm text-red-400'>
+                                    Passwords you entered do not match
+                                </div> : null }
 
-                            <div className="flex ml-14 text-lg gap-x-10 mt-2 mb-2">
-                                <div className="flex-none mt-3">
-                                    Confirm Password
+                                <div className="text-md text-center mt-2">
+                                    <button className="text-white bg-blue-500 px-3 py-1 rounded-md"
+                                    type="submit"
+                                    >
+                                        Submit
+                                    </button>
                                 </div>
-                                <div className="flex-none rounded-sm">
-                                    <input className="pl-3 py-2 w-42 bg-inherit outline-0 border-b-[1px] border-gray-400 text-sm" placeholder="Confirm new password"/>
-                                </div>
-                            </div>
 
-                        </div> : null}
 
-                        <div className="text-md text-center mt-2">
-                            <button className="text-white border-[1px] bg-blue-500 px-3 py-1 rounded-sm"
-                            type="submit"
-                            >
-                                Submit
-                            </button>
-                        </div>
-                    </form>
-
+                            </form>
+                        </div> }
+                    </div>
                 </div>
             </div>
         )
