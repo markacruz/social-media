@@ -293,8 +293,8 @@ export default class Home extends React.Component {
                             {this.state.createPost ? 
                                 <form className="w-full bg-gray-200"
                                 onSubmit={this.handleSubmit}>
-                                    <div className='flex justify-center items-center'>
-                                        <div className='ml-2 mr-2'>
+                                    <div className='flex justify-center items-center mb-1'>
+                                        <div className='mx-2'>
                                             <textarea className="px-2 mt-4 h-32 w-56 outline-0 rounded-sm resize-none"
                                             placeholder="What's on your mind?" 
                                             name="text"
@@ -314,8 +314,6 @@ export default class Home extends React.Component {
                                         </button>
                                     </div>
                                 </form> 
-                                
-                                
                                 
                                 : null }
 

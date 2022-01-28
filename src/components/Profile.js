@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import profilePicture from './profilepicture.jpg'
 import { withRouter, Redirect } from "react-router-dom";
+import FollowingsModal from './FollowingsModal';
 
 class Profile extends React.Component {
 
@@ -14,11 +15,15 @@ class Profile extends React.Component {
             text: "",
             editProfile: false,
             createPost: false,
+            followings: [],
+            postOrComment: "posts",
+            openFollowerModal: false
         }
     }
 
     componentDidUpdate(prevProps) {
         if (!(this.props.match.params.username === prevProps.match.params.username)) {
+            this.setState({ editProfile: false, openFollowerModal: false })
             const getUsersURL = `http://localhost:3000/api/users?username=${this.props.match.params.username}`
             axios.get(getUsersURL)
             .then(response => {
@@ -42,8 +47,7 @@ class Profile extends React.Component {
     }
 
     componentDidMount() {
-        
-        this.setState({ editProfile: false })
+        this.setState({ editProfile: false, openFollowerModal: false })
         const getUsersURL = `http://localhost:3000/api/users?username=${this.props.match.params.username}`
         axios.get(getUsersURL)
         .then(response => {
@@ -134,7 +138,7 @@ class Profile extends React.Component {
         }).catch(err => console.log(err))
 
         this.setState(prevState => ({
-            user: [{...prevState.user, followers: this.state.user.followers.concat(this.props.userData._id)}]
+            user: {...prevState.user, followers: this.state.user.followers.concat(this.props.userData._id)}
         }))
 
     }
@@ -148,12 +152,9 @@ class Profile extends React.Component {
             console.log(response)
         }).catch(err => console.log(err))
 
-        
-
         this.setState(prevState => ({
-            user: [{...prevState.user, followers: this.state.user.followers.filter(follower => follower !== this.props.userData._id)}]
+            user: {...prevState.user, followers: this.state.user.followers.filter(follower => follower !== this.props.userData._id)}
         }))
-        console.log(this.state.user)
     }
 
     handleLike = (id) => {
@@ -182,6 +183,27 @@ class Profile extends React.Component {
         }
     }
 
+    handleRadio = (value) => {
+        this.setState({ postOrComment: value.target.value})
+    }
+
+    handleFollowing = () => {
+        axios.get(`http://localhost:3000/api/users/friends/${this.state.user._id}`)
+        .then(response => {
+            this.setState({
+                followings: response.data,
+                openFollowerModal: true
+            })
+        })
+    }
+
+    handleFollowingModal = () => {
+        this.setState({
+            openFollowerModal: false
+        })
+    }
+
+
     render() {
 
         if (this.state.editProfile) {
@@ -191,7 +213,7 @@ class Profile extends React.Component {
         return(
             <div className=''>
                 <div className="flex justify-center">
-                    <div className='flex items-center gap-x-16 mt-5'>
+                    <div className='flex items-center gap-x-[2em] mt-5'>
                         <img src={profilePicture}
                         className='rounded-full w-[175px]'/>
                         <div>
@@ -223,9 +245,7 @@ class Profile extends React.Component {
                                         Unfollow
                                     </button> }
                                 </div> : null }
-                                </div>
-
-                                
+                                </div>                                
                                 }
                                 
                                 
@@ -250,14 +270,20 @@ class Profile extends React.Component {
                                     </div>
                                 </div> : null }
 
+                                {this.state.openFollowerModal ? <FollowingsModal followings={this.state.followings} close={this.handleFollowingModal} /> : null}
+
                                 {this.state.user.followings !== undefined ?
-                                <div className='flex gap-x-1'>
-                                    <h1 className='font-semibold'>
-                                        {this.state.user.followings.length}
-                                    </h1>
-                                    <div>
-                                        Following
-                                    </div>
+                                <div>
+                                    <button className='flex gap-x-1'
+                                    onClick={this.handleFollowing}>
+                                        <h1 className='font-semibold'>
+                                            {this.state.user.followings.length}
+                                        </h1>
+                                        <div>
+                                            Following
+                                        </div>      
+                                    </button>
+                                          
                                 </div>  : null }
 
                             </div>
@@ -275,18 +301,21 @@ class Profile extends React.Component {
 
                 <div className='flex justify-center'>
                     <div>
-                        <input defaultChecked type="radio" name="option" id="posts" class="hidden" value="posts"/>
-                        <label htmlFor="posts" class="label-checked:bg-gray-300 p-2 font-semibold mt-1 tracking-widest cursor-pointer">POSTS</label>
+                        <input defaultChecked onChange={this.handleRadio} type="radio" name="option" id="posts" className="hidden" value="posts"/>
+                        <label htmlFor="posts" className="label-checked:bg-gray-300 p-2 font-semibold mt-1 tracking-widest cursor-pointer">POSTS</label>
                     </div>
                     <div>
-                        <input type="radio" name="option" id="comments" class="hidden" value="comments"/>
-                        <label htmlFor="comments" class="label-checked:bg-gray-300 p-2 font-semibold mt-1 tracking-widest cursor-pointer">COMMENTS</label>
+                        <input onChange={this.handleRadio} type="radio" name="option" id="comments" className="hidden" value="comments"/>
+                        <label htmlFor="comments" className="label-checked:bg-gray-300 p-2 font-semibold mt-1 tracking-widest cursor-pointer">COMMENTS</label>
                     </div>         
-
                 </div>
 
+                
                 <div className='flex justify-center'>
-                    <div className="flex gap-x-10 mt-2">
+
+                {this.state.postOrComment === "posts" ? 
+
+                    <div className="flex gap-x-5 mt-2">
                             <div className="flex-none w-[525px] h-[700px] px-5 max-h-[575px] overflow-y-scroll">
                                 
                                 {this.state.posts.length === 0 ? 
@@ -362,12 +391,16 @@ class Profile extends React.Component {
                                 </form> : null }
                                 </div>
                             </div> : null }
-                        </div> 
-                </div> 
+                        </div>  : 
+                        
+                        <div className='font-thin text-lg mt-4'>
+                            User has not commented
+                        </div>
+                        }
+                </div>
             </div>
         )
     }
 }
-
 
 export default withRouter(Profile)

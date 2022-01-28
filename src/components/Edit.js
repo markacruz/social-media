@@ -98,7 +98,7 @@ export default class Edit extends React.Component {
                     
                     <div className='flex flex-col justify-center my-10 w-[400px] gap-y-3'>
 
-                        <div className='flex justify-center items-center gap-x-2'>
+                        <div className='flex justify-center items-center gap-x-2 mb-3'>
                             <img src={profile}
                             className='w-[70px] rounded-full'
                             alt="Profile"/>
@@ -118,52 +118,58 @@ export default class Edit extends React.Component {
 
                         {!this.state.changePassword ? 
                         <form onSubmit={this.handleSubmit}
-                        className='flex flex-col gap-y-4'>
-                            <div className="flex justify-center gap-x-10 items-center">
-                                <div className="font-semibold">
-                                    Username
+                        >
+                            <div className='flex justify-center gap-x-5 mb-6'>
+
+                                
+                                <div className="flex flex-col gap-y-8 items-end font-semibold">
+                                    <div className="">
+                                        Username
+                                    </div>
+                                    <div className="">
+                                        Email
+                                    </div>
+                                    <div className="">
+                                        Bio
+                                    </div>
+                                    
                                 </div>
-                                <div className="rounded-sm">
-                                    <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
-                                    placeholder={this.props.userData.username}
-                                    value={this.state.newUsername}
-                                    name="newUsername"
-                                    onChange={this.handleChange}
-                                    />
-                                </div>
-                            </div>
 
 
-                            <div className="flex justify-center gap-x-10 items-center">
-                                <div className="font-semibold">
-                                    Email
-                                </div>
-                                <div className="rounded-sm">
-                                    <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
-                                    placeholder={this.props.userData.email}
-                                    value={this.state.newEmail}
-                                    name="newEmail"
-                                    onChange={this.handleChange}
-                                    />
-                                </div>
-                            </div>
+                                <div className="flex flex-col gap-y-6 items-start">
+                                    
+                                    <div className="rounded-sm">
+                                        <input className="pl-2 py-1 w-[200px] bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                        placeholder={this.props.userData.username}
+                                        value={this.state.newUsername}
+                                        name="newUsername"
+                                        onChange={this.handleChange}
+                                        />
+                                    </div>
 
-                            <div className="flex justify-center gap-x-10 items-center">
-                                <div className="font-semibold">
-                                    Bio
+                                    <div className="rounded-sm">
+                                        <input className="pl-2 py-1 w-[200px] bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                        placeholder={this.props.userData.email}
+                                        value={this.state.newEmail}
+                                        name="newEmail"
+                                        onChange={this.handleChange}
+                                        />
+                                    </div>
+
+                                    <div className="rounded-sm">
+                                        <textarea className="w-[200px] pl-2 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                        placeholder={this.props.userData.desc ? this.props.userData.desc : "Enter a bio"}
+                                        value={this.state.newDesc}
+                                        name="newDesc"
+                                        onChange={this.handleChange}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="rounded-sm">
-                                    <textarea className="w-[200px] pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
-                                    placeholder={this.props.userData.desc ? this.props.userData.desc : "Enter a bio"}
-                                    value={this.state.newDesc}
-                                    name="newDesc"
-                                    onChange={this.handleChange}
-                                    />
-                                </div>
+
                             </div>
 
                             <div className="text-md text-center mt-2">
-                                <button className="text-white bg-blue-500 px-3 py-1 rounded-md"
+                                <button className="text-white bg-blue-500 px-3 py-1 rounded"
                                 type="submit"
                                 >
                                     Submit
@@ -175,51 +181,62 @@ export default class Edit extends React.Component {
 
                         <div>
                             <form onSubmit={this.handleSubmit}
-                        className='flex flex-col gap-y-4'>
-                                <div className="flex justify-center gap-x-10 items-center">
-                                    <div className="font-semibold">
-                                        New Password
+                            >
+                                <div className='flex justify-center gap-x-4'>
+                                    <div className="flex flex-col gap-y-5 items-end">
+                                        <div className="font-semibold">
+                                            New Password
+                                        </div>
+
+                                        <div className="font-semibold">
+                                            Confirm Password
+                                        </div>
+                                        
                                     </div>
-                                    <div className="rounded-sm">
-                                        <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
-                                        type="password"
-                                        placeholder= "·········"
-                                        value={this.state.newPassword}
-                                        name="newPassword"
-                                        onChange={this.handleChange}
-                                        />
-                                    </div>
-                                </div>
 
 
-                                <div className="flex justify-center gap-x-10 items-center">
-                                    <div className="font-semibold">
-                                        Confirm Password
+                                    <div className="flex flex-col gap-y-3 items-start">
+                                        
+                                        <div className="rounded-sm">
+                                            <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                            type="password"
+                                            placeholder= "·········"
+                                            value={this.state.newPassword}
+                                            name="newPassword"
+                                            onChange={this.handleChange}
+                                            />
+                                        </div>
+
+                                        <div className="rounded-sm">
+                                            <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
+                                            type="password"
+                                            placeholder= "·········"
+                                            value={this.state.confirmPassword}
+                                            name="confirmPassword"
+                                            onChange={this.handleChange}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="rounded-sm">
-                                        <input className="pl-3 py-1 w-42 bg-inherit outline-0 border-[1px] border-gray-300 text-sm rounded-sm" 
-                                        type="password"
-                                        placeholder= "·········"
-                                        value={this.state.confirmPassword}
-                                        name="confirmPassword"
-                                        onChange={this.handleChange}
-                                        />
-                                    </div>
+
+                                    
+
                                 </div>
+
+                                
+
+                                <div className="text-md text-center">
 
                                 {this.state.passwordError ? 
-                                <div className='text-center text-sm text-red-400'>
-                                    Passwords you entered do not match
-                                </div> : null }
-
-                                <div className="text-md text-center mt-2">
-                                    <button className="text-white bg-blue-500 px-3 py-1 rounded-md"
+                                    <div className='text-center text-sm text-red-400 mt-1'>
+                                        Passwords you entered do not match
+                                    </div> : null }
+                                    
+                                    <button className="text-white bg-blue-500 px-3 py-1 rounded-md mt-5"
                                     type="submit"
                                     >
                                         Submit
                                     </button>
                                 </div>
-
 
                             </form>
                         </div> }

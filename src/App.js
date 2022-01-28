@@ -1,32 +1,27 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Redirect ,BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
-import Edit from './components/Edit'
+import Edit from './components/Edit';
+import Cookies from 'js-cookie';
+
+const isValid = Cookies.get("isValid")
+const userData = {
+  _id: Cookies.get("id"),
+  username: Cookies.get("username"),
+  email: Cookies.get("email"),
+}
 
 export default class App extends React.Component {
 
-  state = {
-    authToken: process.env.REACT_APP_AUTH_TOKEN,
-    userData: [],
-    isLoginValid: false
-  }
-
-  handleLogin = (_userData, _isLoginValid) => {
-    this.setState({
-      userData: _userData,
-      isLoginValid: _isLoginValid
-    });
-  }
-
   handleSignOut = () => {
-    this.setState({
-      isLoginValid: false,
-      userData: []
-    });
+    Cookies.remove('isValid')
+    Cookies.remove('id')
+    Cookies.remove('username')
+    Cookies.remove('email')
   }
 
   render() {
@@ -34,28 +29,34 @@ export default class App extends React.Component {
 
       <Router>
         <Switch>
-
           <Route exact path="/">
-            <Login isLoginValid={this.state.isLoginValid} onLogin={this.handleLogin} />
-          </Route>
+            <Login />
+          </Route> 
 
-          {this.state.isLoginValid &&
+          {isValid ? 
           <Route exact path="/home">
-              <Navbar userData={this.state.userData} handleSignOut={this.handleSignOut}/>
-              <Home userData={this.state.userData} />
-          </Route> }
+              <Navbar userData={userData} handleSignOut={this.handleSignOut}/>
+              <Home userData={userData} />
+          </Route> :
+          
+          <Redirect to='/' />
+          }
 
-          {this.state.isLoginValid &&
+          {isValid ?
           <Route exact path="/profile/:username">
-              <Navbar userData={this.state.userData} handleSignOut={this.handleSignOut}/>
-              <Profile userData={this.state.userData}/>
-          </Route> }
+              <Navbar userData={userData} handleSignOut={this.handleSignOut}/>
+              <Profile userData={userData}/>
+          </Route> :
+          <Redirect to='/' />
+          }
 
-          {this.state.isLoginValid &&
+          {isValid ?
           <Route exact path="/edit/:username">
-              <Navbar userData={this.state.userData} handleSignOut={this.handleSignOut}/>
-              <Edit userData={this.state.userData}/>
-          </Route> }
+              <Navbar userData={userData} handleSignOut={this.handleSignOut}/>
+              <Edit userData={userData}/>
+          </Route> :
+          
+          <Redirect to='/' />}
 
         </Switch>
       </Router>

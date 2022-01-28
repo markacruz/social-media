@@ -3,6 +3,9 @@ import networkImage from '../networkimage.png';
 import CreateAnAccount from './CreateAnAccount';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
+import Cookies from 'js-cookie'
+
+const isLoginValid = Cookies.get("isValid")
 
 export default class Login extends React.Component {
 
@@ -24,10 +27,13 @@ export default class Login extends React.Component {
         }
     }
 
-
     componentDidMount() {        
-        localStorage.setItem("token", process.env.REACT_APP_AUTH_TOKEN)
         document.body.style.backgroundColor = "#f8f8ff"
+
+        Cookies.remove('isValid')
+        Cookies.remove('id')
+        Cookies.remove('username')
+        Cookies.remove('email')
         
         this.setState({
             username: "",
@@ -50,7 +56,6 @@ export default class Login extends React.Component {
       handleSubmit = (event) => {
         event.preventDefault();
 
-
         this.setState({
             isValid: false,
             incorrectPassword: false,
@@ -65,8 +70,10 @@ export default class Login extends React.Component {
         const URL = `http://localhost:3000/api/auth/login`;
         axios.post(URL, loginForm)
             .then(response => {
-                this.props.onLogin(response.data, true);
-                this.setState({ username: response.data.username })
+                Cookies.set('isValid', true)
+                Cookies.set('username', response.data.username)
+                Cookies.set('email', response.data.email)
+                Cookies.set('id', response.data._id)
             }).catch (err => {
                 console.log(err)
             });
@@ -92,7 +99,7 @@ export default class Login extends React.Component {
   }
 
     render() {
-      if (this.props.isLoginValid && this.state.username) {
+      if (isLoginValid && this.state.username) {
         console.log('Im in!')
         return (
             <Redirect exact to={`/home`}/>
@@ -117,7 +124,7 @@ export default class Login extends React.Component {
       }
 
         return (
-          <div className="flex justify-center items-center h-screen gap-x-5">
+          <div className="flex md:flex-col justify-center items-center h-screen gap-x-5">
             <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px]">
               <div className="text-center">
                   <form onSubmit={this.handleSubmit}>
@@ -185,7 +192,7 @@ export default class Login extends React.Component {
               </div>
             </div>
     
-            <div className="flex-none w-1/2">
+            <div className="flex-none w-1/2 sm:w-[400px] md:w-[400px]">
               <img alt="Network" src={networkImage}/>
             </div>
           </div> 

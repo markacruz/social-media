@@ -63,15 +63,16 @@ export default class Navbar extends React.Component {
 
         return ( 
             <div className="border-[1px]">
-                    <div className="flex mx-1/2 justify-center items-center">
+                    <div className="flex mx-1/2 justify-center items-center px-4">
                         
-                        <div className='font-bold text-xl bg-gradient-to-r from-blue-400 to-red-300 text-white px-3 py-1 rounded-lg '>
+                        <div className='font-bold text-xl bg-gradient-to-r from-blue-400 to-red-300 text-white px-3 py-1 rounded-lg
+                                        sm:hidden '>
                             <Link to="/home">
                                 Facestagram
                             </Link>
                         </div>
 
-                        <div className='w-1/12' />
+                        <div className='w-1/12'/>
                         
                         <div className="w-fit content-end">
                             <form onSubmit={this.handleSubmit}>
@@ -82,12 +83,13 @@ export default class Navbar extends React.Component {
                                 name="searchUser"
                                 onChange={this.handleChange}
                                 onClick={this.handleSearchClick}
+                                autoComplete='off'
                                     />
                              </form>
 
                              {this.state.showSearch ? 
                                 <div className='absolute bg-white w-[240px] border-[1px] mt-2 p-3'>
-                                        {this.state.searchResult.length !== 0 ? 
+                                        {this.state.searchResult.length !== 0 && this.state.searchUser === this.state.searchResult.username ? 
                                         <div className='flex items-center gap-x-2'>
                                             <div>
                                                 <img src={profile} 
