@@ -25,8 +25,7 @@ export default class Home extends React.Component {
             this.setState({ 
                 posts: response.data.reverse(),
             })
-            console.log(this.state.posts)
-            window.history.pushState({}, null, "/home")
+            window.history.pushState({}, null, "social-media/home")
         });
 
         axios.get(`https://hosted-api-website.herokuapp.com/api/users/${this.props.userData._id}/suggested`)
@@ -73,9 +72,8 @@ export default class Home extends React.Component {
             this.setState(prevState => ({
                 posts: [post ,...prevState.posts]
             }))
-            console.log(this.state.posts)
         })
-        window.history.pushState({}, null, '/home')
+        window.history.pushState({}, null, 'social-media/home')
         this.setState({ text: "" })
     }
 
@@ -217,56 +215,7 @@ export default class Home extends React.Component {
                             
                                     <div>
                                     <hr className="mb-3"/>
-                                    {/* {post.comments.map(comment => (
-                                        <div key={comment._id}>
-                                            <div className="flex">
-                                                <div className="flex-none">
-                                                    <img src={profilePicture} className="rounded-full w-[35px]"/>
-                                                </div>
-
-                                                <div className="flex-none pl-3 pt-1 font-semibold">
-                                                    {this.state.users.map(user => (
-                                                        user._id === comment.commentBy ? 
-                                                            <div key={user._id} className="flex gap-x-2">
-                                                                <div>
-                                                                    {user.username}
-                                                                </div>
-                                                                
-                                                                <div className="text-sm font-normal text-gray-500 mt-[3px]">
-                                                                    {comment.date}   
-                                                                </div>
-                                                                
-                                                            </div> : null
-                                                    ))}
-                                                </div>                                          
-                                            </div>
-
-                                            <div className="ml-[47.5px]">
-                                                {comment.text}
-                                            </div>
-
-                                            <hr className="my-3"/>
-                                    
-                                        </div>
-                                    
-                                    ))} */}
-
-                                    {/* <div className="flex pl-[16px] pr-[16px]">
-                                        <div className="flex-none">
-                                            <input className="bg-[#f8f8ff] outline-0 w-[540px]" 
-                                            placeholder="Add a comment..." 
-                                            values={this.state.comment}
-                                            onChange={this.handleChange}
-                                            name="comment"/>
-                                        </div>
-
-                                        <div className="flex-none">
-                                            <button className="text-blue-500"
-                                            onClick={() => this.handleComment(post._id)}>
-                                                Post
-                                            </button>
-                                        </div>
-                                    </div> */}
+        
                                 </div>
                             </div> 
                         ))} 

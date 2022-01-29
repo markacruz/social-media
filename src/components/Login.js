@@ -69,7 +69,6 @@ export default class Login extends React.Component {
                 Cookies.set('id', response.data._id)
 
                 this.setState({ isValid: true })
-
             }).catch (err => {
                 console.log(err)
             });
@@ -97,7 +96,7 @@ export default class Login extends React.Component {
     render() {
       if (this.state.isValid) {
         return (
-            <Redirect to={`/home`}/>
+            <Redirect exact to={'/home'}/>
         )
       }
 

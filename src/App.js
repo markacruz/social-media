@@ -38,8 +38,7 @@ export default class App extends React.Component {
               <Navbar userData={userData} handleSignOut={this.handleSignOut}/>
               <Home userData={userData} />
           </Route> :
-          
-          <Redirect to='/' />
+          <Redirect exact to='/' />
           }
 
           {isValid ?
@@ -47,7 +46,7 @@ export default class App extends React.Component {
               <Navbar userData={userData} handleSignOut={this.handleSignOut}/>
               <Profile userData={userData}/>
           </Route> :
-          <Redirect to='/' />
+          <Redirect exact to='/' />
           }
 
           {isValid ?
@@ -55,8 +54,7 @@ export default class App extends React.Component {
               <Navbar userData={userData} handleSignOut={this.handleSignOut}/>
               <Edit userData={userData}/>
           </Route> :
-          
-          <Redirect to='/' />}
+          <Redirect exact to='/' />}
 
         </Switch>
       </Router>

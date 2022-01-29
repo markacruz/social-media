@@ -68,7 +68,7 @@ export default class Edit extends React.Component {
                 }).catch (err => {
                     console.log(err)
                 });
-            window.history.pushState({}, null, `/profile/${this.props.userData.username}`)
+            window.history.pushState({}, null, `social-media/profile/${this.props.userData.username}`)
         }
     }
 
