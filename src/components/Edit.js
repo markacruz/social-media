@@ -6,9 +6,9 @@ import { Redirect } from "react-router-dom";
 export default class Edit extends React.Component {
 
     state = {
-        newUsername: undefined,
-        newEmail: undefined,
-        newDesc: undefined,
+        newUsername: this.props.userData.username,
+        newEmail: this.props.userData.email,
+        newDesc: this.props.userData.desc,
         changePassword: false,
         newPassword: undefined,
         confirmPassword: undefined,
@@ -58,7 +58,7 @@ export default class Edit extends React.Component {
         }
 
         if (passwordValid || this.state.newPassword === undefined) {
-            const URL = `http://localhost:3000/api/users/${this.props.userData._id}`;
+            const URL = `https://hosted-api-website.herokuapp.com/api/users/${this.props.userData._id}`;
             axios.put(URL, updateUser)
                 .then(response => { 
                     console.log(response)
@@ -121,7 +121,6 @@ export default class Edit extends React.Component {
                         >
                             <div className='flex justify-center gap-x-5 mb-6'>
 
-                                
                                 <div className="flex flex-col gap-y-8 items-end font-semibold">
                                     <div className="">
                                         Username

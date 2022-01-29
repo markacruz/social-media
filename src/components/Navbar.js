@@ -6,6 +6,7 @@ import home from '../home.png';
 import message from '../message.png';
 import signout from '../signout.png';
 import ReactDOM from 'react-dom';
+import githubLogo from '../github.png';
 
 export default class Navbar extends React.Component {
 
@@ -50,7 +51,7 @@ export default class Navbar extends React.Component {
     handleSubmit = (event) => {
         event.preventDefault();
         
-        const findUserURL = `http://localhost:3000/api/users?username=${this.state.searchUser}`
+        const findUserURL = `https://hosted-api-website.herokuapp.com/api/users?username=${this.state.searchUser}`
         axios.get(findUserURL)
         .then(response => {
             this.setState({ 
@@ -65,10 +66,10 @@ export default class Navbar extends React.Component {
             <div className="border-[1px]">
                     <div className="flex mx-1/2 justify-center items-center px-4">
                         
-                        <div className='font-bold text-xl bg-gradient-to-r from-blue-400 to-red-300 text-white px-3 py-1 rounded-lg
-                                        sm:hidden '>
+                        <div className='font-thin text-xl bg-blue-500 text-white px-4 py-2 rounded-lg
+                                        sm:hidden'>
                             <Link to="/home">
-                                Facestagram
+                                Social Media.
                             </Link>
                         </div>
 
@@ -152,11 +153,7 @@ export default class Navbar extends React.Component {
                                     <img className="w-[27.5px] " src={signout} />
                                 </Link>
                             </button>
-                        </div>
-
-                        
-
-                                         
+                        </div>                                         
                     </div>
             </div>
         )

@@ -5,8 +5,6 @@ import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import Cookies from 'js-cookie'
 
-const isLoginValid = Cookies.get("isValid")
-
 export default class Login extends React.Component {
 
     constructor(props) {
@@ -30,10 +28,10 @@ export default class Login extends React.Component {
     componentDidMount() {        
         document.body.style.backgroundColor = "#f8f8ff"
 
-        Cookies.remove('isValid')
-        Cookies.remove('id')
-        Cookies.remove('username')
-        Cookies.remove('email')
+        // Cookies.remove('isValid')
+        // Cookies.remove('id')
+        // Cookies.remove('username')
+        // Cookies.remove('email')
         
         this.setState({
             username: "",
@@ -56,24 +54,22 @@ export default class Login extends React.Component {
       handleSubmit = (event) => {
         event.preventDefault();
 
-        this.setState({
-            isValid: false,
-            incorrectPassword: false,
-            userNotFound: false
-        })
-
         const loginForm = {
             email: this.state.email,
             password: this.state.password
         }
 
-        const URL = `http://localhost:3000/api/auth/login`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/auth/login`;
         axios.post(URL, loginForm)
             .then(response => {
+                
                 Cookies.set('isValid', true)
                 Cookies.set('username', response.data.username)
                 Cookies.set('email', response.data.email)
                 Cookies.set('id', response.data._id)
+
+                this.setState({ isValid: true })
+
             }).catch (err => {
                 console.log(err)
             });
@@ -99,23 +95,22 @@ export default class Login extends React.Component {
   }
 
     render() {
-      if (isLoginValid && this.state.username) {
-        console.log('Im in!')
+      if (this.state.isValid) {
         return (
-            <Redirect exact to={`/home`}/>
+            <Redirect to={`/home`}/>
         )
       }
 
       if (this.state.createAnAccount || this.state.forgotPassword) {
           return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex md:flex-col justify-center items-center h-screen gap-x-5">
               <div className="flex-none bg-gray-100 w-fit h-85 rounded p-10 shadow-lg border-[1px]">
                 <div className="text-center">
                   <CreateAnAccount isLoginValid={this.props.isLoginValid} action={this.handler} userNotFound={this.userNotFoundHandler} isValidHandler={this.isValidHandler}/> 
                 </div>
               </div>
 
-              <div className="flex-none w-1/2">
+              <div className="flex-none w-1/2 sm:w-[400px] md:w-[400px] sm:mt-4 md:mt-4">
                 <img alt="Network" src={networkImage}/>
               </div>
 
@@ -192,7 +187,7 @@ export default class Login extends React.Component {
               </div>
             </div>
     
-            <div className="flex-none w-1/2 sm:w-[400px] md:w-[400px]">
+            <div className="flex-none w-1/2 sm:w-[400px] md:w-[400px] sm:mt-4 md:mt-4">
               <img alt="Network" src={networkImage}/>
             </div>
           </div> 

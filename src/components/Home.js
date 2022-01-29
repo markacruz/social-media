@@ -19,7 +19,7 @@ export default class Home extends React.Component {
     componentDidMount() {
         document.body.style.backgroundColor = "#f8f8ff";
 
-        const timelinePostsURL = `http://localhost:3000/api/posts/timeline/${this.props.userData._id}`;
+        const timelinePostsURL = `https://hosted-api-website.herokuapp.com/api/posts/timeline/${this.props.userData._id}`;
         axios.get(timelinePostsURL)
         .then(response => {
             this.setState({ 
@@ -29,7 +29,7 @@ export default class Home extends React.Component {
             window.history.pushState({}, null, "/home")
         });
 
-        axios.get(`http://localhost:3000/api/users/${this.props.userData._id}/suggested`)
+        axios.get(`https://hosted-api-website.herokuapp.com/api/users/${this.props.userData._id}/suggested`)
         .then(response => {
             this.setState({
                 suggestedUsers: response.data
@@ -63,7 +63,7 @@ export default class Home extends React.Component {
             likes: []
         }
 
-        const URL = `http://localhost:3000/api/posts`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts`;
         axios.post(URL, reqPost, {
             headers: {
             'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export default class Home extends React.Component {
     }
 
     handleDelete = (id) => {
-        const URL = `http://localhost:3000/api/posts/${id}`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
         axios.delete(URL, { data: {userId: this.props.userData._id }})
         .then(response => { 
             console.log(response)
@@ -92,7 +92,7 @@ export default class Home extends React.Component {
     }
 
     handleLike = (id) => {
-        const URL = `http://localhost:3000/api/posts/${id}/like`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}/like`;
         axios.put(URL, { 
             userId: this.props.userData._id
         })
@@ -118,7 +118,7 @@ export default class Home extends React.Component {
     }
 
     handleFollow = (userId) => {
-        const followURL = `http://localhost:3000/api/users/${userId}/follow`
+        const followURL = `https://hosted-api-website.herokuapp.com/api/users/${userId}/follow`
         axios.put(followURL, {
             userId: this.props.userData._id
         })
@@ -191,17 +191,16 @@ export default class Home extends React.Component {
 
                                 <div className="flex gap-x-2 my-2 pl-4">
                                     <div className="flex-none">
-                                        <button className="text-white bg-red-300 rounded-sm px-3"
+                                        {!post.likes.includes(this.props.userData._id) ?
+                                        <button className="text-white bg-red-200 rounded-sm px-3"
                                         onClick={() => this.handleLike(post._id)}>
                                             ❤️
-                                        </button> 
-                                    </div>
-
-                                    <div className="flex-none">
-                                        <button className="text-white bg-blue-300 rounded-sm px-3"
+                                        </button> :
+                                        <button className="text-white bg-red-500 rounded-sm px-3"
                                         onClick={() => this.handleLike(post._id)}>
-                                            💭
-                                        </button> 
+                                            🤍
+                                        </button>
+                                        }
                                     </div>
     
                                     {post.userId._id === this.props.userData._id && post._id !== undefined ? <div className="flex-none">

@@ -56,7 +56,7 @@ export default class CreateAnAccount extends React.Component {
                 password: this.state.password,
             }
     
-            const URL = `http://localhost:3000/api/auth/register`;
+            const URL = `https://hosted-api-website.herokuapp.com/api/auth/register`;
             axios.post(URL, user)
                 .then(response => {
                     if (response.status === 200) {

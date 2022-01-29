@@ -24,7 +24,7 @@ class Profile extends React.Component {
     componentDidUpdate(prevProps) {
         if (!(this.props.match.params.username === prevProps.match.params.username)) {
             this.setState({ editProfile: false, openFollowerModal: false })
-            const getUsersURL = `http://localhost:3000/api/users?username=${this.props.match.params.username}`
+            const getUsersURL = `https://hosted-api-website.herokuapp.com/api/users?username=${this.props.match.params.username}`
             axios.get(getUsersURL)
             .then(response => {
                 this.setState({ 
@@ -34,7 +34,7 @@ class Profile extends React.Component {
                 console.log(err)
             })
 
-            const userPostsURL = `http://localhost:3000/api/posts/profile/${this.props.match.params.username}`;
+            const userPostsURL = `https://hosted-api-website.herokuapp.com/api/posts/profile/${this.props.match.params.username}`;
             axios.get(userPostsURL)
             .then(response => {
                 this.setState({ 
@@ -48,7 +48,7 @@ class Profile extends React.Component {
 
     componentDidMount() {
         this.setState({ editProfile: false, openFollowerModal: false })
-        const getUsersURL = `http://localhost:3000/api/users?username=${this.props.match.params.username}`
+        const getUsersURL = `https://hosted-api-website.herokuapp.com/api/users?username=${this.props.match.params.username}`
         axios.get(getUsersURL)
         .then(response => {
             this.setState({ 
@@ -58,7 +58,7 @@ class Profile extends React.Component {
             console.log(err)
         })
 
-        const userPostsURL = `http://localhost:3000/api/posts/profile/${this.props.match.params.username}`;
+        const userPostsURL = `https://hosted-api-website.herokuapp.com/api/posts/profile/${this.props.match.params.username}`;
         axios.get(userPostsURL)
         .then(response => {
             this.setState({ 
@@ -94,7 +94,7 @@ class Profile extends React.Component {
             likes: []
         }
 
-        const URL = `http://localhost:3000/api/posts`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts`;
         axios.post(URL, reqPost, {
             headers: {
             'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ class Profile extends React.Component {
     }
 
     handleDelete = (id) => {
-        const URL = `http://localhost:3000/api/posts/${id}`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}`;
         axios.delete(URL, { data: { userId: this.props.userData._id }})
             .then(response => {
                 console.log(response)
@@ -129,7 +129,7 @@ class Profile extends React.Component {
     }
 
     handleFollow = () => {
-        const followURL = `http://localhost:3000/api/users/${this.state.user._id}/follow`
+        const followURL = `https://hosted-api-website.herokuapp.com/api/users/${this.state.user._id}/follow`
         axios.put(followURL, {
             userId: this.props.userData._id
         })
@@ -144,7 +144,7 @@ class Profile extends React.Component {
     }
 
     handleUnfollow = () => {
-        const followURL = `http://localhost:3000/api/users/${this.state.user._id}/unfollow`
+        const followURL = `https://hosted-api-website.herokuapp.com/api/users/${this.state.user._id}/unfollow`
         axios.put(followURL, {
             userId: this.props.userData._id
         })
@@ -158,7 +158,7 @@ class Profile extends React.Component {
     }
 
     handleLike = (id) => {
-        const URL = `http://localhost:3000/api/posts/${id}/like`;
+        const URL = `https://hosted-api-website.herokuapp.com/api/posts/${id}/like`;
         axios.put(URL, { 
             userId: this.props.userData._id
         })
@@ -188,7 +188,7 @@ class Profile extends React.Component {
     }
 
     handleFollowing = () => {
-        axios.get(`http://localhost:3000/api/users/friends/${this.state.user._id}`)
+        axios.get(`https://hosted-api-website.herokuapp.com/api/users/friends/${this.state.user._id}`)
         .then(response => {
             this.setState({
                 followings: response.data,
@@ -341,10 +341,16 @@ class Profile extends React.Component {
 
                                                 <div className='flex gap-x-2'>
                                                     <div className="flex-none">
-                                                        <button className="text-white bg-red-300 rounded-sm px-3"
+                                                    {!post.likes.includes(this.props.userData._id) ?
+                                                        <button className="text-white bg-red-200 rounded-sm px-3 group"
                                                         onClick={() => this.handleLike(post._id)}>
                                                             ❤️
-                                                        </button> 
+                                                        </button> :
+                                                        <button className="text-white bg-red-500 rounded-sm px-3"
+                                                        onClick={() => this.handleLike(post._id)}>
+                                                            🤍
+                                                        </button>
+                                                        }
                                                     </div>
                                                     
                                                     {this.props.userData.username === this.state.user.username && post._id !== undefined ?
