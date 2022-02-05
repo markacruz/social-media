@@ -48,6 +48,7 @@ class Profile extends React.Component {
 
     componentDidMount() {
         this.setState({ editProfile: false, openFollowerModal: false })
+        // window.history.pushState({}, null, `/social-media/profile/${this.props.userData.username}`)
         const getUsersURL = `https://hosted-api-website.herokuapp.com/api/users?username=${this.props.match.params.username}`
         axios.get(getUsersURL)
         .then(response => {

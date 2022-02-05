@@ -27,11 +27,6 @@ export default class Login extends React.Component {
 
     componentDidMount() {        
         document.body.style.backgroundColor = "#f8f8ff"
-
-        // Cookies.remove('isValid')
-        // Cookies.remove('id')
-        // Cookies.remove('username')
-        // Cookies.remove('email')
         
         this.setState({
             username: "",

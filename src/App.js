@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect , HashRouter as Router, Route, Switch } from 'react-router-dom';
+import { Redirect , HashRouter, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Login from './components/Login';
 import Profile from './components/Profile';
@@ -27,7 +27,7 @@ export default class App extends React.Component {
   render() {
     return (
 
-      <Router>
+      <HashRouter>
         <Switch>
           <Route exact path="/">
             <Login />
@@ -57,7 +57,7 @@ export default class App extends React.Component {
           <Redirect exact to='/' />}
 
         </Switch>
-      </Router>
+      </HashRouter>
 
     );
   }

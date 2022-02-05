@@ -25,7 +25,6 @@ export default class Home extends React.Component {
             this.setState({ 
                 posts: response.data.reverse(),
             })
-            window.history.pushState({}, null, "/social-media/home")
         });
 
         axios.get(`https://hosted-api-website.herokuapp.com/api/users/${this.props.userData._id}/suggested`)
@@ -73,7 +72,6 @@ export default class Home extends React.Component {
                 posts: [post ,...prevState.posts]
             }))
         })
-        window.history.pushState({}, null, '/social-media/home')
         this.setState({ text: "" })
     }
 
