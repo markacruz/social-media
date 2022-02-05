@@ -96,7 +96,7 @@ export default class Login extends React.Component {
     render() {
       if (this.state.isValid) {
         return (
-            <Redirect exact to={'/home'}/>
+            <Redirect to={'/home'}/>
         )
       }
 
